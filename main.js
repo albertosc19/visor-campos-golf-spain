@@ -873,7 +873,7 @@ function setupMapLegend(mapInstance) {
   const el = document.createElement('div');
   el.className = 'map-legend';
   el.innerHTML = `
-    <img src="${BASE_URL}icons/leyenda.png" alt="Leyenda del mapa" />
+    <img src="/visor-campos-golf-spain/icons/leyenda.png" alt="Leyenda del mapa" />
   `;
   mapInstance.getTargetElement().appendChild(el);
 }
