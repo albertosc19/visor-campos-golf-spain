@@ -450,3 +450,69 @@ html, body {
   height: auto;
   object-fit: contain;
 }
+
+#rightbar {
+  position: fixed;
+  top: 56px;
+  right: 0;
+  width: 300px;
+  height: calc(100vh - 56px);
+  overflow: auto;
+  padding: 12px 12px 14px;
+  z-index: 900;
+  background: #eef8ee;
+  border-left: 1px solid rgba(132, 175, 150, 0.45);
+  box-sizing: border-box;
+  transition: transform 0.28s ease;
+}
+
+#map {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 300px;
+  bottom: 0;
+  transition: right 0.28s ease;
+}
+
+#rightbar-toggle {
+  position: fixed;
+  top: 72px;
+  right: 312px;
+  z-index: 1200;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(0,0,0,0.18);
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  transition:
+    right 0.28s ease,
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+#rightbar-toggle:hover {
+  background: #f5f5f5;
+  transform: scale(1.04);
+}
+
+/* estado oculto */
+body.rightbar-collapsed #rightbar {
+  transform: translateX(100%);
+}
+
+body.rightbar-collapsed #map {
+  right: 0;
+}
+
+body.rightbar-collapsed #rightbar-toggle {
+  right: 12px;
+}
+
+body.rightbar-collapsed #rightbar-toggle {
+  transform: rotate(180deg);
+}
