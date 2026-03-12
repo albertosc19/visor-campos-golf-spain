@@ -337,6 +337,29 @@ const map = new OLMap({
   view,
 });
 
+const rightbarToggleBtn = document.getElementById('rightbar-toggle');
+
+if (rightbarToggleBtn) {
+  rightbarToggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('rightbar-collapsed');
+
+    const collapsed = document.body.classList.contains('rightbar-collapsed');
+    rightbarToggleBtn.textContent = collapsed ? '❮' : '❯';
+    rightbarToggleBtn.setAttribute(
+      'aria-label',
+      collapsed ? 'Mostrar panel' : 'Ocultar panel'
+    );
+    rightbarToggleBtn.setAttribute(
+      'title',
+      collapsed ? 'Mostrar panel' : 'Ocultar panel'
+    );
+
+    setTimeout(() => {
+      map.updateSize();
+    }, 300);
+  });
+}
+
 // ========================
 // Icono dinámico por zoom (cacheado) + hover (halo)
 // ========================
