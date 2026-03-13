@@ -865,9 +865,7 @@ function setupZoomIndicator(mapInstance) {
 
 setupZoomIndicator(map);
 
-// ========================
-// Leyenda flotante
-// ========================
+// insertar la imagen de la leyenda
 
 function setupMapLegend(mapInstance) {
   const el = document.createElement('div');
@@ -880,9 +878,7 @@ function setupMapLegend(mapInstance) {
 
 setupMapLegend(map);
 
-// ========================
-// Buscador (Nominatim) + Buscar por provincia/municipio (interno)
-// ========================
+// Buscador con Nominatim + buscar por provincia/municipio
 
 const bluePinSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24">
@@ -909,7 +905,7 @@ map.addLayer(searchMarkerLayer);
 
 // Capa para dibujar líneas desde el punto buscado a los 3 campos más cercanos
 const nearestLinksSource = new VectorSource();
-let hoveredRouteIdx = null; // índice (0-2) de la ruta a resaltar desde la lista
+let hoveredRouteIdx = null; // para un índice (0-2) de la ruta a resaltar desde la lista
 
 const nearestLinksLayer = new VectorLayer({
   source: nearestLinksSource,
@@ -920,9 +916,9 @@ const nearestLinksLayer = new VectorLayer({
     const isHover = hoveredRouteIdx !== null && idx === hoveredRouteIdx;
 
     return new Style({
-      // Rutas/líneas más visibles (más grosor)
+      // Rutas/líneas 
       stroke: new Stroke({
-        color: isHover ? 'rgba(255,235,59,0.95)' : 'rgba(30,136,229,0.85)', // amarillo al hover
+        color: isHover ? 'rgba(255,235,59,0.95)' : 'rgba(30,136,229,0.85)', // amarillo para resaltar el hover
         width: isHover ? 7 : 5,
         lineCap: 'round',
         lineJoin: 'round',
@@ -1028,14 +1024,14 @@ function showResetButton(show) {
   resetPanel.style.display = show ? 'block' : 'none';
 }
 
-// Limpia cualquier resultado previo (marker, rutas, lista, hover, estados UI)
+// función para limpiar la búsqueda que se haya hecho previamente
 function resetSearchState() {
-  // limpia input + sugerencias
+  // limpiar input + sugerencias
   if (input) input.value = '';
   if (status) status.textContent = '';
   hideSuggestions();
 
-  // oculta paneles de provincia/municipio y resetea selects
+  // ocultar paneles de provincia/municipio y resetear selects
   if (panelProvincia) panelProvincia.style.display = 'none';
   if (panelMunicipio) panelMunicipio.style.display = 'none';
 
@@ -1070,12 +1066,12 @@ btnResetSearch?.addEventListener('click', () => {
   resetSearchState();
 });
 
-  // Panel de "más cercanos" (se rellena al seleccionar una dirección)
+  // Panel de "más cercanos" en cuanto seleccionemos una dirección
   const nearbyPanel = container.querySelector('#nearby-panel');
   const nearbyList = container.querySelector('#nearby-list');
   let lastNearest = []; // [{ feature, distM }]
 
-// Hover en la lista: resalta la ruta correspondiente en amarillo
+// Hover en la lista para resaltar la ruta correspondiente en amarillo
 if (nearbyList) {
   nearbyList.addEventListener('mouseover', (ev) => {
     const item = ev.target?.closest?.('.nearby-item');
@@ -1097,7 +1093,7 @@ if (nearbyList) {
   let debounceTimer = null;
   let lastResults = [];
 
-  // ------- Nominatim (direcciones) -------
+  // uso de NOMINATIM para direcciones
   async function nominatimSearch(q, limit) {
     const url =
       'https://nominatim.openstreetmap.org/search?' +
@@ -1149,7 +1145,7 @@ if (nearbyList) {
     searchMarkerSource.clear();
     searchMarkerSource.addFeature(new Feature(new Point(coord)));
 
-    // Además: muestra los 3 campos más cercanos y dibuja las líneas con distancias
+    // muestra los 3 campos más cercanos y dibuja las líneas con distancias
     updateNearestClubsFromCoord(coord);
     showResetButton(true);
 
@@ -1175,7 +1171,7 @@ if (nearbyList) {
   function formatCarSummary(distM, durS) {
     const distTxt = formatDistance(distM);
     const durTxt = formatDuration(durS);
-    // "8.20 km · 12 min"
+    // "8.20 km y 12 min por ejj"
     return `${distTxt} · ${durTxt}`;
   }
 
@@ -1186,20 +1182,17 @@ if (nearbyList) {
     nearestLinksSource.clear();
   }
 
-  // Calcula los 3 clubes más cercanos al punto seleccionado y actualiza UI + líneas en mapa
+  // calcula los 3 clubes más cercanos al punto seleccionado y actualiza la UI + líneas en mapa
   
-  // Calcula los 3 clubes más cercanos al punto seleccionado usando *coche* (OSRM demo)
-  // Flujo:
-  // 1) Preselecciona candidatos por distancia "en línea recta" (rápido y barato)
-  // 2) Pide a OSRM una matriz (tabla) de distancias/duraciones desde el punto a esos candidatos
-  // 3) Se queda con los 3 mejores (por tiempo) y dibuja la ruta real + etiqueta con km/min
+  // Calcula los 3 clubes más cercanos al punto seleccionado usando el coche (OSRM demo)
+
   async function updateNearestClubsFromCoord(coord3857) {
     if (!coord3857) {
       clearNearestUI();
       return;
     }
 
-    // Espera a que el GeoJSON de clubes esté listo
+    // Espera al GeoJSON de clubes
     if (btnPuntualSource.getState() !== 'ready') {
       if (nearbyPanel) nearbyPanel.style.display = 'block';
       if (nearbyList) {
@@ -1212,7 +1205,7 @@ if (nearbyList) {
     const originLonLat = toLonLat(coord3857);
     const feats = btnPuntualSource.getFeatures();
 
-    // 1) candidatos por distancia recta (para no pedir rutas a los 1000 clubes)
+    // 1) candidatos por distancia recta 
     const straight = [];
     for (const f of feats) {
       const g = f.getGeometry();
@@ -1233,13 +1226,12 @@ if (nearbyList) {
       return;
     }
 
-    // UI de "cargando..."
+    // "cargando..."
     if (nearbyPanel) nearbyPanel.style.display = 'block';
     if (nearbyList) nearbyList.innerHTML = '<div class="nearby-empty">Calculando rutas en coche…</div>';
     nearestLinksSource.clear();
 
-    // 2) OSRM TABLE (demo pública). Ojo: es "best effort", puede fallar o limitar.
-    // Endpoint: https://router.project-osrm.org/table/v1/driving/{lon,lat};{lon,lat}...
+    // 2) OSRM TABLE (demo pública, podría fallar )
     const coordParts = [
       `${originLonLat[0]},${originLonLat[1]}`,
       ...candidates.map((it) => {
@@ -1260,14 +1252,14 @@ if (nearbyList) {
       if (!resp.ok) throw new Error(`OSRM table HTTP ${resp.status}`);
       const data = await resp.json();
 
-      const durations = data?.durations?.[0]; // seconds, index 0 -> origin
-      const distances = data?.distances?.[0]; // meters
+      const durations = data?.durations?.[0]; 
+      const distances = data?.distances?.[0]; 
 
       if (!Array.isArray(durations) || !Array.isArray(distances)) {
         throw new Error('OSRM table: respuesta inesperada');
       }
 
-      // Empareja resultados con candidatos (durations/distances[1..N])
+      // empareja resultados con candidatos 
       routed = candidates
         .map((it, i) => ({
           ...it,
@@ -1277,7 +1269,7 @@ if (nearbyList) {
         // filtra entradas sin ruta
         .filter((it) => Number.isFinite(it.durS) && Number.isFinite(it.roadM));
 
-      // Si OSRM no devuelve nada útil, forzamos fallback
+      // Si no devuelve nada útil, forzar fallback
       if (!routed.length) throw new Error('OSRM table: sin rutas válidas');
     } catch (e) {
       console.warn('OSRM table falló, usando distancia recta como fallback:', e);
@@ -1290,7 +1282,7 @@ if (nearbyList) {
       });
     }
 
-    // 3) elige los 3 mejores por tiempo (en coche)
+    // 3) elige los 3 mejores por tiempo
     routed.sort((a, b) => a.durS - b.durS);
     lastNearest = routed.slice(0, 3).map((it, i) => ({ ...it, rank: i }));
 
@@ -1331,13 +1323,13 @@ if (nearbyList) {
       }
     }
 
-    // 4) rutas en mapa: intenta OSRM ROUTE para los 3 elegidos; si falla, línea recta
+    // 4) rutas en mapa: intenta OSRM ROUTE para los 3 elegidos y si falla, línea recta
     nearestLinksSource.clear();
 
     await Promise.all(
       lastNearest.map(async (it) => {
         try {
-          // Si venimos de fallback, no tiene sentido pedir route
+          // Si viene de fallback, no pide route
           if (it.fallback) throw new Error('fallback');
 
           const destLonLat = toLonLat(it.coord);
@@ -1434,7 +1426,7 @@ if (nearbyList) {
     goToResult(r);
   });
 
-  // Click en uno de los "más cercanos" → centra en el campo (sin abrir la ficha)
+  // Click en uno de los "más cercanos" , centra en el campo (sin abrir la ficha)
   nearbyList?.addEventListener('click', (ev) => {
     const target = ev.target;
     if (!(target instanceof HTMLElement)) return;
@@ -1458,7 +1450,7 @@ if (nearbyList) {
 
   input.addEventListener('blur', () => setTimeout(hideSuggestions, 300));
 
-  // ------- Provincias DINÁMICAS desde GeoJSON -------
+  // provincias dinámicas desde el geojson
   function fillProvinciaSelectFromGeoJSON(sel) {
     if (btnPuntualSource.getState() !== 'ready') {
       sel.innerHTML = `<option value="" selected>Cargando provincias…</option>`;
@@ -1497,7 +1489,7 @@ if (nearbyList) {
     panelProvincia.style.display = 'none';
   });
 
-  // ------- Buscar por provincia (100% interno) -------
+  // buscar por provincia
   selectProvincia.addEventListener('change', () => {
     const prov = selectProvincia.value;
     if (!prov) return;
@@ -1525,14 +1517,14 @@ if (nearbyList) {
     searchMarkerSource.clear();
     searchMarkerSource.addFeature(new Feature(new Point(center)));
 
-    // Si veníamos de una búsqueda por dirección, limpia rutas/lista de cercanos
+    // si veníamos de una búsqueda por dirección, limpia rutas/lista de cercanos
     clearNearestUI();
     showResetButton(true);
 
     provStatus.textContent = `Mostrando clubes en ${prov}`;
   });
 
-  // ------- Buscar por municipio (100% interno) -------
+  // búsqueda por municipio dentro del geojson
   selectProvinciaMun.addEventListener('change', () => {
     const prov = selectProvinciaMun.value;
 
@@ -1581,7 +1573,7 @@ if (nearbyList) {
     searchMarkerSource.clear();
     searchMarkerSource.addFeature(new Feature(new Point(center)));
 
-    // Si veníamos de una búsqueda por dirección, limpia rutas/lista de cercanos
+    // si venía de una búsqueda por dirección, limpia rutas/lista de cercanos
     clearNearestUI();
     showResetButton(true);
 
@@ -1591,9 +1583,7 @@ if (nearbyList) {
 
 createSearchBox(map);
 
-// ========================
-// Toggles: capas + mapa base (select)
-// ========================
+// Toggles: capas + mapa base 
 
 function bindToggle(id, onChange) {
   const el = document.getElementById(id);
