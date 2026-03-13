@@ -31,24 +31,21 @@ import {
 
 import { getDistance } from 'ol/sphere';
 
+// para las rutas base usando vite en github
 const BASE_URL = import.meta.env.BASE_URL;
 
-// ========================
-// Hover state (solo campos de golf puntuales)
-// ========================
+// resaltar el icono al hacer hover
 let hoveredGolfFeature = null;
 
-// ========================
-// Estilos temáticos (solo visibles desde zoom >= 16)
-// NO tocar rfeg_clubes
-// ========================
-
+// pasar los mm a px
 const MM_TO_PX = 3.7795275591; // aprox. 1 mm a 96 dpi
 const qgisMm = (mm) => mm * MM_TO_PX;
 
+// crear cachés para no repetir estilos
 const styleCache = new window.Map();
 const pointIconCache = new window.Map();
 
+// pasa los colores hexa a rgba
 function rgbaFromHex(hex, alpha = 1) {
   const h = hex.replace('#', '');
   const bigint = parseInt(h, 16);
@@ -58,10 +55,12 @@ function rgbaFromHex(hex, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+// clave única para la caché
 function makeStyleKey(parts) {
   return JSON.stringify(parts);
 }
 
+// controles de caché
 function getCachedStyle(key, factory) {
   if (styleCache.has(key)) return styleCache.get(key);
   const style = factory();
@@ -76,6 +75,7 @@ function getCachedIconStyle(key, factory) {
   return style;
 }
 
+// que devuelva true si tenemos zoom 15 o más
 function isDetailZoom() {
   return (view.getZoom() ?? 0) >= 15;
 }
@@ -244,11 +244,7 @@ function osmPointStyleFn(feature) {
   });
 }
 
-
-// ========================
 // Helpers
-// ========================
-
 function makeGeoJsonSource(url) {
   return new VectorSource({
     url,
@@ -270,7 +266,7 @@ function makeVectorLayer({ source, visible = false, style, declutter = false, zI
   return layer;
 }
 
-// normaliza strings para comparar (sin tildes, trim, lower)
+// normalizar strings para comparar (sin tildes, trim, lower)
 function norm(s) {
   return (s ?? '')
     .toString()
@@ -291,9 +287,7 @@ function escapeHtml(s) {
     .replaceAll("'", '&#039;');
 }
 
-// ========================
 // MAPAS BASE (XYZ/TMS)
-// ========================
 
 const baseOSM = new TileLayer({
   visible: true,
@@ -322,10 +316,7 @@ function setBaseMap(activeKey) {
   baseMTN50.setVisible(activeKey === 'mtn50');
 }
 
-// ========================
 // Vista + mapa
-// ========================
-
 const view = new View({
   center: [-443000, 4865000],
   zoom: 6.2,
@@ -337,6 +328,7 @@ const map = new OLMap({
   view,
 });
 
+// botón para colapsar la barra lateral derecha
 const rightbarToggleBtn = document.getElementById('rightbar-toggle');
 
 if (rightbarToggleBtn) {
@@ -360,9 +352,7 @@ if (rightbarToggleBtn) {
   });
 }
 
-// ========================
-// Icono dinámico por zoom (cacheado) + hover (halo)
-// ========================
+// Icono dinámico de los campos de golf según su nivel de zoom y hacer hover
 
 function iconScaleForZoom(z) {
   if (z <= 6) return 0.015;
@@ -382,9 +372,11 @@ function haloRadiusForZoom(z) {
   return 20;
 }
 
+// cachés de los iconos
 const iconStyleCache = new window.Map();
 const iconHoverStyleCache = new window.Map();
 
+//estilo del icono normal
 function getGolfIconStyleForZoom(z) {
   const bucket = Math.round(z * 2) / 2;
   if (iconStyleCache.has(bucket)) return iconStyleCache.get(bucket);
@@ -404,6 +396,7 @@ function getGolfIconStyleForZoom(z) {
   return style;
 }
 
+// estilo del hover
 function getGolfHoverStyleForZoom(z) {
   const bucket = Math.round(z * 2) / 2;
   if (iconHoverStyleCache.has(bucket)) return iconHoverStyleCache.get(bucket);
@@ -436,7 +429,7 @@ function getGolfHoverStyleForZoom(z) {
   return arr;
 }
 
-// estilo base para otros puntos (OSM_Point) — sin hover
+// estilo base para otros puntos (OSM_Point) sin hover
 function iconStyleFn(feature, resolution) {
   const z = view.getZoom() ?? 0;
   return getGolfIconStyleForZoom(z);
@@ -451,9 +444,7 @@ function golfIconStyleFn(feature, resolution) {
   return getGolfIconStyleForZoom(z);
 }
 
-// ========================
-// Etiquetas (desde zoom >= 13) — SOLO campo "nombre"
-// ========================
+// Etiquetas desde el zoom 13 solo con el campo nombre
 
 const labelStyleCache = new window.Map();
 
@@ -487,9 +478,7 @@ function labelStyleFn(feature, resolution) {
   return getLabelStyle(nombre);
 }
 
-// ========================
-// Capas
-// ========================
+// Capas vectoriales
 
 const btnPuntualSource = makeGeoJsonSource(`${BASE_URL}data/rfeg_clubes.geojson`);
 
@@ -555,9 +544,7 @@ map.addLayer(osmAreaLayer);
 map.addLayer(osmLineLayer);
 map.addLayer(osmPointLayer);
 
-// ========================
 // Hover sobre puntos de golf
-// ========================
 
 map.on('pointermove', (evt) => {
   if (evt.dragging) return;
@@ -595,7 +582,7 @@ view.on('change:resolution', () => {
   osmPointLayer.changed();
 });
 
-// Auto-fit a datos
+// ajuste a datos
 btnPuntualSource.once('change', () => {
   if (btnPuntualSource.getState() === 'ready') {
     const extent = btnPuntualSource.getExtent();
@@ -605,9 +592,7 @@ btnPuntualSource.once('change', () => {
   }
 });
 
-// ========================
-// Índice interno provincia -> municipios (desde GeoJSON)
-// ========================
+// Índice interno provincia -> municipios desde el GeoJSON
 
 const provToMunicipios = new window.Map(); // provKey -> Map(munKey -> displayMun)
 const provKeyToDisplay = new window.Map(); // provKey -> displayProvincia
@@ -662,9 +647,7 @@ const onGolfReady = () => {
 onGolfReady();
 btnPuntualSource.on('change', onGolfReady);
 
-// ========================
 // Modal al hacer clic + fondo apagado
-// ========================
 
 const popupEl = document.getElementById('popup');
 const popupCloser = document.getElementById('popup-closer');
@@ -703,9 +686,7 @@ window.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape') closeModal();
 });
 
-// ========================
-// Popup “bonito” (imagen + título + teléfono + email + link)
-// ========================
+// Popup correcto: imagen + título + teléfono + email + link a la rfeg
 
 const phoneSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
@@ -725,7 +706,7 @@ function asCleanText(v) {
 function normalizeUrl(u) {
   const s = asCleanText(u);
   if (!s) return '';
-  // Si viene sin protocolo, asumimos https
+  // si viene sin protocolo, asumimos https
   if (!/^https?:\/\//i.test(s)) return `https://${s}`;
   return s;
 }
@@ -799,11 +780,9 @@ function renderClubPopup(props) {
   `;
 }
 
-// ========================
-// Click: comportamiento distinto según zoom
-// - zoom < 16: centrar + zoom 16 (sin modal)
-// - zoom >= 16: abrir modal (centrando suave) y render popup nuevo
-// ========================
+// Click con comportamiento distinto según zoom
+// para zoom < 16: centrar y ajustar a zoom 16 el campo
+// para zoom >= 16: abrir el popup con info del campo
 
 map.on('singleclick', (evt) => {
   let foundFeature = null;
@@ -830,7 +809,7 @@ map.on('singleclick', (evt) => {
 
   const currentZoom = map.getView().getZoom() ?? 0;
 
-  // Centro del punto clicado
+  // centro del punto clicado
   const geom = foundFeature.getGeometry();
   let center = null;
 
@@ -845,7 +824,7 @@ map.on('singleclick', (evt) => {
     center = [(ext[0] + ext[2]) / 2, (ext[1] + ext[3]) / 2];
   }
 
-  // 1) Zoom por debajo de 16 → SOLO centrar + zoom 16, sin modal
+  // 1) Zoom por debajo de 16 
   if (currentZoom < 16) {
     if (center) {
       map.getView().animate({ center, zoom: 16, duration: 600 });
@@ -855,7 +834,7 @@ map.on('singleclick', (evt) => {
     return;
   }
 
-  // 2) Zoom 16 o superior → abrir modal (centrando suave opcional)
+  // 2) Zoom 16 o superior 
   if (center) {
     map.getView().animate({ center, duration: 250 });
   }
@@ -867,9 +846,7 @@ map.on('singleclick', (evt) => {
   openModal();
 });
 
-// ========================
 // Indicador de zoom
-// ========================
 
 function setupZoomIndicator(mapInstance) {
   const el = document.createElement('div');
