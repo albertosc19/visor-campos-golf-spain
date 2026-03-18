@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visor de Campos de Golf</title>
-    <link rel="icon" type="image/png" href="/icons/icon_web.png" />
+    <link rel="icon" type="image/png" href="icons/icon_web.png" />
   </head>
 
   <body>
     <header class="topbar">
       <div class="topbar-brand">
-        <img class="topbar-logo" src="/icons/logo_rfeg.png" alt="Logo RFEG" />
+        <img class="topbar-logo" src="icons/logo_rfeg.png" alt="Logo RFEG" />
         <div class="topbar-title">
           <span class="topbar-kicker">Campos de golf de España</span>
           <span class="topbar-title-text">Visor cartográfico interactivo</span>
@@ -36,75 +36,36 @@
         <div class="section-title">Mapa base</div>
         <div class="select-row basemap-select-row">
           <div id="basemap-picker" class="basemap-picker">
-            <button
-              id="basemap-picker-btn"
-              class="basemap-picker-btn"
-              type="button"
-              aria-label="Seleccionar mapa base"
-              aria-haspopup="listbox"
-              aria-expanded="false"
-            >
+            <button id="basemap-picker-btn" class="basemap-picker-btn" type="button" aria-label="Seleccionar mapa base" aria-haspopup="listbox" aria-expanded="false">
               <span class="basemap-picker-current">
-                <img
-                  id="basemap-current-thumb"
-                  src="/icons/osm.png"
-                  alt="Miniatura del mapa base seleccionado"
-                />
+                <img id="basemap-current-thumb" src="icons/osm.png" alt="Miniatura del mapa base seleccionado" />
                 <span id="basemap-current-label">OpenStreetMap</span>
               </span>
               <span class="basemap-picker-caret" aria-hidden="true">▾</span>
             </button>
-
             <div id="basemap-picker-menu" class="basemap-picker-menu" role="listbox" aria-label="Opciones de mapa base">
-              <button
-                class="basemap-option"
-                type="button"
-                role="option"
-                aria-selected="false"
-                data-value="carto"
-                data-label="Carto Positron"
-                data-thumb="/icons/carto.png"
-              >
-                <img src="/icons/carto.png" alt="Miniatura Carto Positron" />
+              <button class="basemap-option" type="button" role="option" aria-selected="false" data-value="carto" data-label="Carto Positron" data-thumb="icons/carto.png">
+                <img src="icons/carto.png" alt="Miniatura Carto Positron" />
                 <span class="basemap-option-text">
                   <strong>Carto Positron</strong>
                   <small>Mapa base escala de grises</small>
                 </span>
               </button>
-
-              <button
-                class="basemap-option is-active"
-                type="button"
-                role="option"
-                aria-selected="true"
-                data-value="osm"
-                data-label="OpenStreetMap"
-                data-thumb="/icons/osm.png"
-              >
-                <img src="/icons/osm.png" alt="Miniatura OpenStreetMap" />
+              <button class="basemap-option is-active" type="button" role="option" aria-selected="true" data-value="osm" data-label="OpenStreetMap" data-thumb="icons/osm.png">
+                <img src="icons/osm.png" alt="Miniatura OpenStreetMap" />
                 <span class="basemap-option-text">
                   <strong>OpenStreetMap</strong>
                   <small>Mapa base de OSM</small>
                 </span>
               </button>
-
-              <button
-                class="basemap-option"
-                type="button"
-                role="option"
-                aria-selected="false"
-                data-value="pnoa"
-                data-label="PNOA"
-                data-thumb="/icons/pnoa.png"
-              >
-                <img src="/icons/pnoa.png" alt="Miniatura PNOA" />
+              <button class="basemap-option" type="button" role="option" aria-selected="false" data-value="pnoa" data-label="PNOA" data-thumb="icons/pnoa.png">
+                <img src="icons/pnoa.png" alt="Miniatura PNOA" />
                 <span class="basemap-option-text">
                   <strong>PNOA</strong>
                   <small>Ortofoto aérea</small>
                 </span>
               </button>
             </div>
-
             <select id="basemap-select" aria-label="Seleccionar mapa base" hidden>
               <option value="carto">Carto Positron</option>
               <option value="osm" selected>OpenStreetMap</option>
@@ -184,7 +145,7 @@
         </div>
         <div class="credits-author">Autor: Alberto Sánchez Colomer</div>
         <div class="credits-brand">
-          <img src="/icons/logo_geoinnova.png" alt="Logo Geoinnova" />
+          <img src="icons/logo_geoinnova.png" alt="Logo Geoinnova" />
         </div>
       </div>
     </aside>
